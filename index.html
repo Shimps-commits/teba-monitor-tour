@@ -1,0 +1,746 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>出羽島　海と共に暮らす</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500&display=swap">
+<style>
+/* Concept: one continuous dive. Aerial video narrows into a window, the page drops under the surface
+   (full-screen sea footage), a day of sea time scrolls sideways,
+   island photos assemble out of depth, the island opens up, and the page ends at dusk.
+   Colors and type from the ごーへい design system; motion is the one deliberate departure for this page. */
+:root {
+  --paper: #ffffff;
+  --bone: #e5e7eb;
+  --charcoal: #0a0a0a;
+  --obsidian: #000000;
+  --deep-current: #031e25;
+  --slate-depth: #1d1d1e;
+  --muted: rgba(255, 255, 255, 0.72);
+  --sans: "Inter", "Noto Sans JP", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --gutter: clamp(20px, 4.2vw, 64px);
+  --ease: cubic-bezier(0.19, 1, 0.22, 1);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { background: var(--obsidian); }
+body {
+  margin: 0; background: var(--obsidian); color: var(--paper);
+  font-family: var(--sans); font-feature-settings: "ss01", "tnum";
+  font-size: 16px; line-height: 1.8; -webkit-font-smoothing: antialiased;
+  line-break: strict; overflow-x: hidden;
+}
+html[data-lang="ja"] [data-l="en"], html[data-lang="en"] [data-l="ja"] { display: none !important; }
+
+.caption { font-size: 11px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; line-height: 1.4; margin: 0; }
+.ph { display: inline-block; }
+h1, h2 { margin: 0; font-weight: 300; font-feature-settings: "palt", "ss01"; text-wrap: balance; }
+h2 { font-size: clamp(30px, 5vw, 76px); line-height: 1.18; letter-spacing: -0.03em; }
+
+/* scroll-linked reveal: --p is set on each section by script (0..1) */
+.rv {
+  --t: clamp(0, calc((var(--p, 0) - var(--a, 0)) / var(--d, 0.12)), 1);
+  --s: calc(var(--t) * var(--t) * (3 - 2 * var(--t)));
+  opacity: var(--s);
+  transform: translate3d(0, calc((1 - var(--s)) * 36px), 0);
+}
+
+/* ---------- chrome ---------- */
+.grain { position: fixed; inset: -50%; z-index: 50; pointer-events: none; opacity: 0.07; mix-blend-mode: overlay; animation: grain 0.9s steps(6) infinite; }
+@keyframes grain { 0% { transform: translate(0,0) } 20% { transform: translate(-3%,2%) } 40% { transform: translate(2%,-4%) } 60% { transform: translate(-4%,-1%) } 80% { transform: translate(3%,3%) } 100% { transform: translate(0,0) } }
+
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+  display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  padding: calc(18px + env(safe-area-inset-top, 0px)) var(--gutter) 18px;
+  mix-blend-mode: difference; color: #fff;
+}
+.mark, .ctrls button { white-space: nowrap; }
+.mark { color: inherit; text-decoration: none; font-size: 13px; font-weight: 500; letter-spacing: 0.24em; text-transform: uppercase; }
+.ctrls { display: flex; align-items: center; gap: 18px; }
+.ctrls button {
+  font: inherit; font-size: 11px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase;
+  color: inherit; background: none; border: 0; padding: 6px 2px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+}
+.ctrls button[aria-pressed="false"].lang-b { opacity: 0.45; }
+.ctrls .music { position: relative; width: 30px; height: 30px; justify-content: center; padding: 0; font-size: 18px; letter-spacing: 0; line-height: 1; }
+.ctrls .music::before, .ctrls .music::after { content: ""; position: absolute; left: 7px; right: 7px; top: 50%; height: 1px; background: currentColor; opacity: 0; }
+.ctrls .music::before { transform: rotate(45deg); }
+.ctrls .music::after { transform: rotate(-45deg); }
+.ctrls .music[aria-pressed="false"]::before, .ctrls .music[aria-pressed="false"]::after { opacity: 1; }
+.ctrls .music[aria-pressed="false"] span { opacity: 0.85; }
+.ctrls button:focus-visible, .mark:focus-visible { outline: 1px solid #fff; outline-offset: 4px; }
+.bars { display: inline-flex; gap: 2px; align-items: flex-end; height: 10px; }
+.bars i { display: block; width: 2px; height: 3px; background: currentColor; }
+.sound-on .bars i { animation: bar 0.9s ease-in-out infinite alternate; }
+.sound-on .bars i:nth-child(2) { animation-delay: -0.3s; }
+.sound-on .bars i:nth-child(3) { animation-delay: -0.6s; }
+.sound-on .bars i:nth-child(4) { animation-delay: -0.15s; }
+@keyframes bar { from { height: 2px } to { height: 10px } }
+
+.hud {
+  position: fixed; left: var(--gutter); bottom: calc(22px + env(safe-area-inset-bottom, 0px)); z-index: 40;
+  display: flex; align-items: baseline; gap: 14px; mix-blend-mode: difference; color: #fff; pointer-events: none;
+}
+.hud .n { font-size: 11px; font-weight: 500; letter-spacing: 0.2em; }
+.hud .t { display: none; }
+.prog { position: fixed; left: 0; right: 0; top: 0; height: 2px; z-index: 41; pointer-events: none; }
+.prog i { display: block; height: 100%; background: var(--paper); transform-origin: 0 50%; transform: scaleX(0); mix-blend-mode: difference; }
+
+.loader {
+  position: fixed; inset: 0; z-index: 70; background: var(--obsidian);
+  display: flex; align-items: flex-end; justify-content: space-between; padding: var(--gutter);
+  transition: transform 1.1s var(--ease);
+}
+.loader.out { transform: translateY(-100%); }
+.loader .ln { font-size: clamp(56px, 12vw, 200px); font-weight: 300; letter-spacing: -0.05em; line-height: 0.8; }
+
+/* ---------- sections ---------- */
+.sc { position: relative; height: var(--h, 300vh); }
+.stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+
+/* 1. hero */
+.hero .stage { background: var(--obsidian); }
+.hero {
+  --io: clamp(0, calc((var(--p, 0) - 0.09) / 0.09), 1);
+  --v: clamp(0, calc((var(--p, 0) - 0.15) / 0.1), 1);
+  --o: clamp(0, calc((var(--p, 0) - 0.34) / 0.08), 1);
+  --w0: clamp(0, calc((var(--p, 0) - 0.38) / 0.24), 1);
+  --w: calc(var(--w0) * var(--w0) * (3 - 2 * var(--w0)));
+  --f: clamp(0, calc((var(--p, 0) - 0.88) / 0.12), 1);
+  --ix: 21%;
+}
+/* opening: black screen with the six lines */
+.intro {
+  position: absolute; z-index: 4; inset: 0; display: flex; align-items: center;
+  padding: 0 var(--gutter); pointer-events: none;
+  opacity: calc(1 - var(--io)); transform: translate3d(0, calc(var(--io) * -6vh), 0);
+}
+.intro ol { list-style: none; margin: 0 auto; padding: 0; width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 0.5em; }
+.intro li { font-size: clamp(17px, 2vw, 30px); font-weight: 300; letter-spacing: 0.02em; line-height: 1.7; opacity: 0; transform: translateY(14px); }
+.intro li.last { font-size: clamp(26px, 3.6vw, 56px); letter-spacing: -0.02em; margin-top: 1.1em; }
+.ready .intro li { opacity: 1; transform: none; transition: opacity 1.4s var(--ease), transform 1.4s var(--ease); transition-delay: calc(var(--n) * 260ms + 200ms); }
+.win {
+  position: absolute; inset: 0; opacity: var(--v);
+  clip-path: inset(calc(var(--w) * 17%) calc(var(--w) * var(--ix)) round calc(var(--w) * 32px));
+}
+.win video, .win .poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(calc(1.14 - var(--w) * 0.14)); }
+.win .poster { background: url("img/01-hero.jpg") center / cover; }
+.win::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.05) 55%, rgba(0,0,0,0.25)); }
+.win .dim { position: absolute; inset: 0; z-index: 1; background: rgba(3, 30, 37, calc(var(--w) * 0.62)); }
+
+.hero-cap { position: absolute; z-index: 3; top: calc(78px + env(safe-area-inset-top, 0px)); left: var(--gutter); opacity: calc(var(--v) * (1 - var(--o))); }
+.title {
+  position: absolute; z-index: 3; left: var(--gutter); right: var(--gutter); bottom: 13vh;
+  font-size: clamp(28px, 7.6vw, 132px); line-height: 1.02; letter-spacing: -0.045em;
+  opacity: calc(1 - var(--o)); transform: translate3d(0, calc(var(--o) * -14vh), 0);
+}
+html[data-lang="en"] .title { font-size: clamp(34px, 7vw, 124px); line-height: 0.98; }
+.title .kicker { display: flex; flex-wrap: nowrap; justify-content: space-between; gap: 1.1em; white-space: nowrap; margin-bottom: clamp(10px, 2vh, 24px); font-size: clamp(11px, 1.6vw, 40px); font-weight: 400; letter-spacing: 0.06em; line-height: 1.2; opacity: 0; transform: translateY(10px); }
+.title .kicker span:last-child { margin-right: -0.06em; }
+.hero.show-title .title .kicker { opacity: 1; transform: none; transition: opacity 1.2s var(--ease), transform 1.2s var(--ease); transition-delay: 0.1s; }
+.title .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+.title .c { display: inline-block; transform: translateY(110%); }
+.hero.show-title .title .c { transform: none; transition: transform 1.3s var(--ease); transition-delay: calc(var(--i) * 55ms + 150ms); }
+
+.cue { position: absolute; z-index: 3; left: 50%; bottom: 28px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 10px; opacity: calc(1 - var(--p, 0) * 14); }
+.cue i { display: block; width: 1px; height: 48px; background: linear-gradient(var(--paper), transparent); transform-origin: top; animation: cue 1.8s var(--ease) infinite; }
+@keyframes cue { 0% { transform: scaleY(0) } 50% { transform: scaleY(1) } 100% { transform: scaleY(1); opacity: 0 } }
+
+.hero-in { position: absolute; z-index: 3; inset: 17% var(--ix); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 4vh; padding: 0 4%; }
+.hero-in .lead { font-size: clamp(18px, 2.1vw, 32px); font-weight: 300; letter-spacing: -0.005em; line-height: 1.7; margin: 0; max-width: 22em; }
+.hero-in .sub { font-size: clamp(15px, 1.35vw, 19px); line-height: 1.9; margin: 0; max-width: 30em; color: rgba(255, 255, 255, 0.88); }
+.hero .fade { position: absolute; inset: 0; z-index: 5; background: #052a33; opacity: var(--f); pointer-events: none; }
+
+/* 1b. Sora Kimura */
+.sora .stage { background: var(--obsidian); }
+.sora-img { position: absolute; inset: 0; background: url("img/sora.jpg") center 62% / cover; transform: scale(calc(1.12 - var(--p, 0) * 0.12)); }
+.sora .stage::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to bottom, rgba(3,30,37,0.62) 0%, rgba(3,30,37,0.3) 42%, rgba(3,30,37,0) 62%); }
+.sora .txt { position: absolute; z-index: 2; left: var(--gutter); right: var(--gutter); top: calc(96px + env(safe-area-inset-top, 0px)); display: flex; flex-direction: column; gap: clamp(16px, 3vh, 32px); }
+.sora h2 { font-size: clamp(28px, 7.6vw, 132px); line-height: 1.02; letter-spacing: -0.045em; }
+html[data-lang="en"] .sora h2 { font-size: clamp(34px, 7vw, 124px); }
+.sora .txt p { margin: 0; max-width: 32em; font-size: clamp(16px, 1.55vw, 23px); font-weight: 300; line-height: 1.9; }
+
+/* 2. under the sea */
+.sea .stage { background: #052a33; }
+.seav { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(calc(1.2 - var(--p, 0) * 0.2)); }
+.sea .stage::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to top, rgba(3,30,37,0.82), rgba(3,30,37,0.15) 60%, rgba(3,30,37,0.35)); }
+.sea .txt { position: absolute; z-index: 2; left: var(--gutter); bottom: 14vh; max-width: min(820px, 86vw); pointer-events: none; }
+.sea .txt h2 { margin: 18px 0 20px; }
+.sea .txt p.line { margin: 0; font-size: clamp(16px, 1.4vw, 20px); color: var(--muted); }
+/* 3. sea time, horizontal */
+.time .stage { background: var(--obsidian); display: flex; align-items: center; }
+.track { display: flex; align-items: stretch; gap: 3.2vw; padding: 0 8vw 0 var(--gutter); height: 70svh; will-change: transform; }
+.tf { position: relative; flex: 0 0 auto; width: min(64vw, 1080px); height: 100%; border-radius: 32px; overflow: hidden; background: var(--slate-depth); }
+.tf.intro { width: min(46vw, 720px); background: none; border-radius: 0; overflow: visible; display: flex; flex-direction: column; justify-content: center; gap: 20px; }
+.tf.intro h2 { font-size: clamp(34px, 4.8vw, 84px); }
+.tf.intro .body { margin: 0; font-size: clamp(15px, 1.25vw, 18px); line-height: 1.9; color: var(--muted); max-width: 30em; }
+.tf .img, .tf video { position: absolute; top: 0; bottom: 0; left: -10%; width: 120%; height: 100%; object-fit: cover; background-size: cover; background-position: center; transform: translate3d(var(--px, 0), 0, 0) scale(1.04); }
+.tf::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0) 50%), linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0) 30%); }
+.tf.intro::after { display: none; }
+.tf .lab { position: absolute; z-index: 2; top: clamp(18px, 3vw, 36px); left: clamp(20px, 3vw, 40px); font-size: clamp(34px, 5vw, 84px); font-weight: 300; letter-spacing: -0.04em; line-height: 1; }
+.tf .say { position: absolute; z-index: 2; left: clamp(20px, 3vw, 40px); right: clamp(20px, 3vw, 40px); bottom: clamp(20px, 3vw, 40px); margin: 0; font-size: clamp(17px, 1.7vw, 26px); font-weight: 300; line-height: 1.55; max-width: 22em; }
+.dial { position: absolute; left: var(--gutter); right: var(--gutter); bottom: calc(26px + env(safe-area-inset-bottom, 0px)); height: 1px; background: rgba(255,255,255,0.22); margin-left: 14vw; }
+.dial b { position: absolute; left: 0; top: -3px; width: 7px; height: 7px; border-radius: 50%; background: var(--paper); transform: translateX(calc(var(--dx, 0) * 1px)); }
+.dial span { position: absolute; top: 12px; transform: translateX(-50%); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+
+/* 4. step by step, further out */
+.steps .stage { background: var(--obsidian); }
+.steps {
+  --i0: clamp(0, calc((var(--p, 0) - 0.1) / 0.08), 1);
+  --a2: clamp(0, calc((var(--p, 0) - 0.42) / 0.08), 1);
+  --a3: clamp(0, calc((var(--p, 0) - 0.72) / 0.08), 1);
+}
+.st-img { position: absolute; inset: 0; background-size: cover; background-position: center; transform: scale(calc(1.08 - var(--p, 0) * 0.08)); }
+.st-img.i1 { opacity: calc(0.35 + var(--i0) * 0.65); }
+.st-img.i2 { opacity: var(--a2); }
+.st-img.i3 { opacity: var(--a3); }
+.steps .stage::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0.12) 58%, rgba(0,0,0,0.3)); }
+/* opening of the chapter: the three stages at a glance */
+.st-intro { position: absolute; z-index: 3; inset: 0; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; justify-content: center; gap: clamp(28px, 6vh, 64px); padding: 0 var(--gutter); opacity: calc(1 - var(--i0)); pointer-events: none; }
+.st-intro h2 { font-size: clamp(34px, 5.6vw, 96px); line-height: 1.1; letter-spacing: -0.04em; }
+.st-intro .lead { margin: 0; max-width: 34em; font-size: clamp(16px, 1.5vw, 22px); font-weight: 300; line-height: 1.8; color: rgba(255,255,255,0.86); }
+.st-head { display: flex; flex-direction: column; gap: clamp(10px, 2vh, 20px); }
+.st-head p { margin: 0; font-size: clamp(14px, 1.4vw, 22px); font-weight: 400; letter-spacing: 0.04em; line-height: 1.5; }
+.st-map { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; max-width: 1200px; }
+.st-map li { position: relative; padding: 18px 24px 0 0; border-top: 1px solid rgba(255,255,255,0.5); display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.st-map li::before { content: ""; position: absolute; left: 0; top: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--paper); }
+.st-map li:not(:last-child)::after { content: "→"; position: absolute; right: 10px; top: -15px; font-size: 18px; color: var(--paper); }
+.st-map .k { font-size: 11px; font-weight: 500; letter-spacing: 0.2em; }
+.st-map .n { font-size: clamp(18px, 2vw, 30px); font-weight: 300; line-height: 1.3; }
+.st-map .w { font-size: 13px; color: rgba(255,255,255,0.7); }
+/* each stage */
+.st-t { position: absolute; z-index: 2; left: var(--gutter); right: calc(var(--gutter) + 180px); bottom: 12vh; max-width: 780px; display: flex; flex-direction: column; gap: 14px; }
+.st-t .k { display: flex; align-items: center; gap: 14px; font-size: 12px; font-weight: 500; letter-spacing: 0.2em; margin: 0; }
+.st-t .k .w { font-weight: 400; letter-spacing: 0.04em; padding: 4px 10px; border: 1px solid rgba(255,255,255,0.6); border-radius: 5px; }
+.st-t h2 { font-size: clamp(34px, 5.6vw, 92px); line-height: 1.1; letter-spacing: -0.04em; }
+.st-t p.b { margin: 0; font-size: clamp(17px, 1.7vw, 26px); font-weight: 300; line-height: 1.6; max-width: 26em; }
+.st-t p.note { margin: 4px 0 0; font-size: clamp(13px, 1vw, 15px); line-height: 1.7; color: rgba(255,255,255,0.82); }
+.st-img.i2::after, .st-img.i3::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(3,30,37,0.78), rgba(3,30,37,0.5) 50%, rgba(3,30,37,0) 80%); }
+@media (min-width: 861px) { .st-img.i1 { background-position: 20% center; } }
+.st-t.t3 h2 { font-size: clamp(26px, 3.6vw, 60px); line-height: 1.2; letter-spacing: -0.02em; }
+.st-spec { margin: 4px 0 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 24px; align-items: baseline; font-size: clamp(15px, 1.3vw, 20px); font-weight: 300; line-height: 1.6; }
+.st-spec dt { font-size: 12px; font-weight: 500; letter-spacing: 0.12em; }
+.st-spec dd { margin: 0; min-width: 0; }
+.st-t.t1 { opacity: calc(var(--i0) * (1 - var(--a2))); transform: translate3d(0, calc(var(--a2) * -24px), 0); }
+.st-t.t2 { opacity: calc(var(--a2) * (1 - var(--a3))); transform: translate3d(0, calc((1 - var(--a2)) * 24px - var(--a3) * 24px), 0); }
+.st-t.t3 { opacity: var(--a3); transform: translate3d(0, calc((1 - var(--a3)) * 24px), 0); }
+.st-rail { position: absolute; z-index: 2; right: var(--gutter); top: 50%; transform: translateY(-50%); height: 46vh; width: 170px; opacity: var(--i0); }
+.st-rail .ln { position: absolute; right: 3px; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,0.28); }
+.st-rail .ln i { position: absolute; inset: 0; background: var(--paper); transform-origin: top; transform: scaleY(calc(var(--a2) * 0.5 + var(--a3) * 0.5)); }
+.st-rail .pt { position: absolute; right: 0; display: flex; align-items: center; gap: 12px; transform: translateY(-50%); font-size: 12px; letter-spacing: 0.06em; white-space: nowrap; }
+.st-rail .pt b { width: 7px; height: 7px; border-radius: 50%; border: 1px solid var(--paper); background: var(--obsidian); order: 2; }
+.st-rail .pt.on b { background: var(--paper); }
+.st-rail .pt span { opacity: 0.55; }
+.st-rail .pt.on span { opacity: 1; }
+.st-rail .p1 { top: 0; } .st-rail .p2 { top: 50%; } .st-rail .p3 { top: 100%; }
+
+/* 5. the island opens */
+.jr .stage { background: var(--obsidian); }
+.jr {
+  --e0: clamp(0, calc(var(--p, 0) / 0.5), 1);
+  --e: calc(var(--e0) * var(--e0) * (3 - 2 * var(--e0)));
+  --dk: clamp(0, calc((var(--p, 0) - 0.42) / 0.2), 1);
+}
+.jimg { position: absolute; inset: 0; background: url("img/02-island.jpg") center / cover; clip-path: circle(calc(9% + var(--e) * 75%) at 50% 52%); transform: scale(calc(1.45 - var(--e) * 0.45)); }
+.jshade { position: absolute; inset: 0; background: rgba(3, 30, 37, calc(var(--dk) * 0.62)); }
+.jr .txt { position: absolute; z-index: 2; left: var(--gutter); right: var(--gutter); bottom: 13vh; display: flex; flex-direction: column; gap: 18px; }
+.jr .txt p { margin: 0; font-size: clamp(17px, 1.7vw, 26px); font-weight: 300; line-height: 1.6; }
+.jr .txt p.small { font-size: 14px; color: var(--muted); }
+
+/* 6. dusk */
+.end { position: relative; min-height: 100vh; min-height: 100svh; overflow: hidden; display: flex; align-items: flex-end; padding: 0 var(--gutter) clamp(72px, 10vh, 120px); }
+.end .bg { position: absolute; inset: -12% 0 0; background: url("img/06-closing.jpg") center / cover; transform: translate3d(0, calc((1 - var(--p, 0)) * -8%), 0) scale(1.08); }
+.end::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0.1) 60%); }
+.end .wrap { position: relative; z-index: 2; width: 100%; }
+.end h2 { font-size: clamp(28px, 7.4vw, 128px); line-height: 1.08; letter-spacing: -0.045em; margin: 18px 0 0; }
+.end .back { color: var(--paper); text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.5); padding-bottom: 4px; }
+.end .back:hover { border-bottom-color: var(--paper); }
+.end .back:focus-visible { outline: 1px solid #fff; outline-offset: 4px; }
+.end .foot { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: clamp(40px, 7vh, 80px); color: var(--muted); }
+
+@media (max-width: 860px) {
+  .hero { --ix: 6%; }
+  .tf { width: 84vw; }
+  .tf.intro { width: 84vw; }
+  .st-t { right: calc(var(--gutter) + 24px); }
+  .st-rail { width: 12px; height: 34vh; }
+  .st-rail .pt span { display: none; }
+  .st-map { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .st-map li { padding-top: 12px; }
+  .st-map li:not(:last-child)::after { content: "↓"; right: auto; left: 14px; top: auto; bottom: -22px; font-size: 14px; }
+  .track { height: 66svh; gap: 5vw; }
+  .dial { margin-left: 0; }
+  .dial span { display: none; }
+  .hud .t { display: none; }
+  .title { bottom: 17vh; }
+  .ctrls { gap: 12px; }
+  .mark { letter-spacing: 0.16em; }
+  .tile { width: calc(var(--w) * 1.5); height: auto; aspect-ratio: 4 / 5; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .grain, .cue i { animation: none; }
+  .intro li, .title .kicker { opacity: 1; transform: none; }
+  .title .c { transform: none; }
+  .loader { display: none; }
+}
+</style>
+
+<div class="loader" id="loader" aria-hidden="true"><span class="ln">Teba-jima</span><span class="ln" id="ldn">0</span></div>
+<div class="grain" id="grain" aria-hidden="true"></div>
+<div class="prog" aria-hidden="true"><i id="prog"></i></div>
+
+<header class="nav">
+  <a class="mark" href="#c1">Teba-jima</a>
+  <div class="ctrls">
+    <button type="button" class="lang-b" id="btn-ja" aria-pressed="true">JA</button>
+    <button type="button" class="lang-b" id="btn-en" aria-pressed="false">EN</button>
+    <button type="button" class="music" id="btn-music" aria-pressed="true" aria-label="BGM"><span aria-hidden="true">♪</span></button>
+  </div>
+</header>
+
+<div class="hud" aria-hidden="true"><span class="n" id="hud-n">01 / 06</span><span class="t" id="hud-t"></span></div>
+
+<main>
+  <!-- 1 -->
+  <section class="sc hero" id="c1" style="--h: 480vh" data-name-ja="出羽島　海と共に暮らす" data-name-en="Teba-jima — Living with the sea">
+    <div class="stage">
+      <div class="win">
+        <div class="poster"></div>
+        <video id="v-hero" src="img/hero.mp4" poster="img/01-hero.jpg" muted loop playsinline preload="auto" aria-hidden="true"></video>
+        <div class="dim"></div>
+      </div>
+      <div class="intro">
+        <ol>
+          <li style="--n: 0"><span data-l="ja">最高の波が来る時間に合わせて、サーフィンをしに行く。</span><span data-l="en">You go surfing when the best waves arrive.</span></li>
+          <li style="--n: 1"><span data-l="ja">波を見て、船を出すかどうかを決める。</span><span data-l="en">You read the waves and decide whether to take the boat out.</span></li>
+          <li style="--n: 2"><span data-l="ja">太陽や空の色が、時間を教えてくれる。</span><span data-l="en">The sun and the colour of the sky tell you the time.</span></li>
+          <li style="--n: 3"><span data-l="ja">生き物が、季節を教えてくれる。</span><span data-l="en">Living things tell you the season.</span></li>
+          <li style="--n: 4"><span data-l="ja">波が、天候を教えてくれる。</span><span data-l="en">The waves tell you the weather.</span></li>
+          <li class="last" style="--n: 5.6"><span data-l="ja">太平洋に浮かぶ出羽島。</span><span data-l="en">Teba-jima, an island in the Pacific.</span></li>
+        </ol>
+      </div>
+      <h1 class="title">
+        <span class="kicker"><span>Discovery Japan “Ocean” vol.1</span><span>Teba-jima</span></span>
+        <span data-l="ja" data-split>出羽島　海と共に暮らす</span>
+        <span data-l="en" data-split>Teba-jima — Living with the sea</span>
+      </h1>
+      <div class="hero-in">
+        <p class="lead rv" style="--a: 0.58; --d: 0.08">
+          <span data-l="ja"><span class="ph">1800年の移住に始まり、</span><span class="ph">漁業とともに発展したこの町は、</span><span class="ph">今も、</span><span class="ph">自然の中の時間に生きている。</span></span>
+          <span data-l="en">Settled in 1800 and grown alongside its fishing, this town still lives by the time of nature.</span>
+        </p>
+        <p class="sub rv" style="--a: 0.65; --d: 0.08">
+          <span data-l="ja"><span class="ph">四国本土から連絡船で15分。</span><span class="ph">島に車はなく、</span><span class="ph">木製の手押し車が行き交う。</span></span>
+          <span data-l="en">15 minutes by ferry from mainland Shikoku. There are no cars on the island; wooden hand carts come and go.</span>
+        </p>
+      </div>
+      <div class="cue caption"><span>Scroll</span><i></i></div>
+      <div class="fade"></div>
+    </div>
+  </section>
+
+  <!-- 1b -->
+  <section class="sc sora" id="c1b" style="--h: 220vh" data-name-ja="木村　空" data-name-en="Sora Kimura">
+    <div class="stage">
+      <div class="sora-img" role="img" aria-label="木村空さんが浜辺のベンチに座り、海を見ている後ろ姿"></div>
+      <div class="txt">
+        <h2 class="rv" style="--a: 0.04; --d: 0.12"><span data-l="ja">木村　空</span><span data-l="en">Sora Kimura</span></h2>
+        <p class="rv" style="--a: 0.14; --d: 0.14">
+          <span data-l="ja">私は出羽島で生まれ、出羽島で育ってきた。出羽島の変わらない自然、変わりゆく人の活気。1800年に本格的な移住が開始され、200年がたった今、失われかけてる知識海と共に生きる日常を次の世代に残したい。</span>
+          <span data-l="en">I was born on Teba-jima and grew up here. The island's nature does not change; the life of its people does. Full-scale settlement began in 1800. Now, some 200 years later, I want to hand on to the next generation the knowledge that is slipping away, and an everyday life lived with the sea.</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="sc sea" id="c2" style="--h: 220vh" data-name-ja="海と生き物" data-name-en="Sea and wildlife">
+    <div class="stage">
+      <video id="v-sea" class="seav" src="img/sea.mp4" poster="img/02-island.jpg" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+      <div class="txt">
+        <h2 class="rv" style="--a: 0.1; --d: 0.14"><span data-l="ja"><span class="ph">多様な生物が、</span><span class="ph">海と共に生きている。</span></span><span data-l="en">A rich variety of life lives with the sea.</span></h2>
+        <p class="line rv" style="--a: 0.2; --d: 0.14"><span data-l="ja"><span class="ph">春にはカンムリウミスズメが産卵に帰ってくる。</span><span class="ph">夏にはイルカやクジラが周遊している。</span><span class="ph">湾内や磯沖に大小さまざまな魚が暮らしている。</span></span><span data-l="en">In spring, Japanese murrelets return to lay their eggs. In summer, dolphins and whales travel these waters. Fish of every size live in the bay and off the rocky shore.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="sc time" id="c3" style="--h: 560vh" data-name-ja="海の時間" data-name-en="Sea time">
+    <div class="stage">
+      <div class="track" id="track">
+        <div class="tf intro">
+          <h2><span data-l="ja"><span class="ph">海を見て、</span><span class="ph">一日を決める。</span></span><span data-l="en">The sea sets the day.</span></h2>
+          <p class="body">
+            <span data-l="ja">島の暮らしは、海の様子に合わせて動いている。漁師は波と風を見て、その日に船を出すかどうかを決める。サーファーは、いい波が来る日に合わせて島へやって来る。天気や潮、波の高さによって、その日にできることが変わる。海が荒れれば、船は出ない。渡れない日も、帰れない日もある。</span>
+            <span data-l="en">Life on the island moves with the sea. Fishermen check the waves and the wind before deciding whether to take the boat out. Surfers time their visits to the days when good waves arrive. Weather, tide and wave height change what each day can hold. When the sea is rough, the boats stay in. Some days you cannot cross over, and some days you cannot leave.</span>
+          </p>
+        </div>
+        <div class="tf" data-lab-ja="夜明け" data-lab-en="Dawn">
+          <div class="img" style="background-image: url('img/dawn.jpg')"></div>
+          <span class="lab"><span data-l="ja">夜明け</span><span data-l="en">Dawn</span></span>
+          <p class="say"><span data-l="ja">夜明け前、漁師は港で波と風を確かめる。海が穏やかなら船を出し、荒れていれば見送る。</span><span data-l="en">Before dawn, fishermen check the waves and wind at the harbour. If the sea is calm, they go out. If not, they wait.</span></p>
+        </div>
+        <div class="tf" data-lab-ja="沖へ" data-lab-en="Out to sea">
+          <video id="v-ferry" src="img/ferry.mp4" poster="img/bluehour.jpg" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+          <span class="lab"><span data-l="ja">沖へ</span><span data-l="en">Out to sea</span></span>
+          <p class="say"><span data-l="ja">海が穏やかな日、船は港を出て沖へ向かう。</span><span data-l="en">On a calm day, the boats leave the harbour and head out to sea.</span></p>
+        </div>
+        <div class="tf" data-lab-ja="昼" data-lab-en="Midday">
+          <div class="img" style="background-image: url('img/midday.jpg')"></div>
+          <span class="lab"><span data-l="ja">昼</span><span data-l="en">Midday</span></span>
+          <p class="say"><span data-l="ja">サーファーは波の具合を見て、最高の波が来る日に合わせて島を訪れる。</span><span data-l="en">Surfers watch the swell and come to the island on the days the best waves arrive.</span></p>
+        </div>
+        <div class="tf" data-lab-ja="夕暮れ" data-lab-en="Dusk">
+          <div class="img" style="background-image: url('img/03-sea.jpg')"></div>
+          <span class="lab"><span data-l="ja">夕暮れ</span><span data-l="en">Dusk</span></span>
+          <p class="say"><span data-l="ja">天気、潮、波の高さ。その日の海が、島の一日の動き方を決める。</span><span data-l="en">Weather, tide, wave height. The sea of the day decides how the day moves on the island.</span></p>
+        </div>
+        <div class="tf" data-lab-ja="夜" data-lab-en="Night">
+          <div class="img" style="background-image: url('img/night.jpg')"></div>
+          <span class="lab"><span data-l="ja">夜</span><span data-l="en">Night</span></span>
+        </div>
+      </div>
+      <div class="dial" id="dial"><b></b></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="sc steps" id="c4" style="--h: 460vh" data-name-ja="体験内容" data-name-en="The programme">
+    <div class="stage">
+      <div class="st-img i1" style="background-image: url('img/day1.jpg')"></div>
+      <div class="st-img i2" style="background-image: url('img/day2.jpg')"></div>
+      <div class="st-img i3" style="background-image: url('img/info.jpg')"></div>
+
+      <div class="st-t t1">
+        <p class="k"><span data-l="ja">1日目</span><span data-l="en">DAY 1</span><span class="w"><span data-l="ja">12月5日（土）</span><span data-l="en">Sat, Dec 5</span></span></p>
+        <h2><span data-l="ja"><span class="ph">島の日常と</span><span class="ph">歴史に出会う</span></span><span data-l="en">Meet the island's daily life and history</span></h2>
+        <p class="b"><span data-l="ja"><span class="ph">町並み・防波堤巡り</span> ／ <span class="ph">港での文化体験（釣り・工芸等）</span> ／ <span class="ph">魚さばき＆干物・鍋づくり</span> ／ <span class="ph">島民との交流</span></span><span data-l="en">Townscape and breakwater walk / Harbour culture (fishing, crafts, etc.) / Filleting fish, making dried fish and hot pot / Time with islanders</span></p>
+        <p class="note"><span data-l="ja">夕食は、自分たちで仕込んだ地魚の鍋を囲み、島の人の昔話を聞きながら団らんする。</span><span data-l="en">Dinner is a hot pot of local fish that you help prepare, shared with islanders over stories of the old days.</span></p>
+      </div>
+      <div class="st-t t2">
+        <p class="k"><span data-l="ja">2日目</span><span data-l="en">DAY 2</span><span class="w"><span data-l="ja">12月6日（日）</span><span data-l="en">Sun, Dec 6</span></span></p>
+        <h2><span data-l="ja"><span class="ph">島の朝と</span><span class="ph">静かな暮らしを楽しむ</span></span><span data-l="en">Enjoy the island's morning and quiet life</span></h2>
+        <p class="b"><span data-l="ja">島そうめん作り</span><span data-l="en">Making island sōmen</span></p>
+        <p class="note"><span data-l="ja">朝食は、前日に仕込んだ干物とご飯、味噌汁。海岸を散策したあと、島の人と団らんしながら島そうめんを囲む。</span><span data-l="en">Breakfast is the dried fish you prepared the day before, with rice and miso soup. After a walk along the shore, share island sōmen with the islanders.</span></p>
+      </div>
+      <div class="st-t t3">
+        <p class="k"><span data-l="ja">開催概要</span><span data-l="en">TOUR DETAILS</span><span class="w"><span data-l="ja">1泊2日</span><span data-l="en">1 night, 2 days</span></span></p>
+        <h2><span data-l="ja"><span class="ph">2026年12月5日（土）</span><span class="ph">〜 12月6日（日）</span></span><span data-l="en">Sat, Dec 5 – Sun, Dec 6, 2026</span></h2>
+        <dl class="st-spec">
+          <dt><span data-l="ja">集合</span><span data-l="en">Meet</span></dt><dd><span data-l="ja">12月5日（土）13:15　牟岐港</span><span data-l="en">13:15, Sat, Dec 5, at Mugi Port</span></dd>
+          <dt><span data-l="ja">解散</span><span data-l="en">Finish</span></dt><dd><span data-l="ja">12月6日（日）15:15　牟岐港</span><span data-l="en">15:15, Sun, Dec 6, at Mugi Port</span></dd>
+          <dt><span data-l="ja">アクセス</span><span data-l="en">Access</span></dt><dd><span data-l="ja">牟岐港まで、JR牟岐駅から徒歩10分</span><span data-l="en">Mugi Port is a 10-minute walk from JR Mugi Station</span></dd>
+          <dt><span data-l="ja">定員</span><span data-l="en">Capacity</span></dt><dd><span data-l="ja">6名（先着順・要事前申込）</span><span data-l="en">6 people (first come, first served; advance booking required)</span></dd>
+        </dl>
+        <p class="note"><span data-l="ja">※体験内容は予定です。</span><span data-l="en">* Activities are as currently planned.</span></p>
+      </div>
+
+      <div class="st-rail" aria-hidden="true">
+        <div class="ln"><i></i></div>
+        <div class="pt p1 on" id="stp1"><span data-l="ja">1日目</span><span data-l="en">DAY 1</span><b></b></div>
+        <div class="pt p2" id="stp2"><span data-l="ja">2日目</span><span data-l="en">DAY 2</span><b></b></div>
+        <div class="pt p3" id="stp3"><span data-l="ja">開催概要</span><span data-l="en">DETAILS</span><b></b></div>
+      </div>
+
+      <div class="st-intro">
+        <div class="st-head">
+          <p><span data-l="ja">出羽島（てばじま）文化体験モニターツアー</span><span data-l="en">Teba-jima Cultural Experience Monitor Tour</span></p>
+          <h2><span data-l="ja"><span class="ph">海と暮らす島の、</span><span class="ph">いまとむかし</span></span><span data-l="en">Now and then, on an island that lives with the sea</span></h2>
+        </div>
+        <p class="lead"><span data-l="ja">今もある島の日常は、昔から紡がれてきた歴史から続いている。1泊2日で島の原風景を体感しながら、その歴史と文化を紐解いていく。</span><span data-l="en">Everyday life on the island today carries on from a history woven long ago. Over one night and two days, experience the island's original landscape and unravel its history and culture.</span></p>
+        <ol class="st-map">
+          <li><span class="k"><span data-l="ja">1日目</span><span data-l="en">DAY 1</span></span><span class="n"><span data-l="ja">島の日常と歴史に出会う</span><span data-l="en">Meet the island's daily life and history</span></span><span class="w"><span data-l="ja">12月5日（土）</span><span data-l="en">Sat, Dec 5</span></span></li>
+          <li><span class="k"><span data-l="ja">2日目</span><span data-l="en">DAY 2</span></span><span class="n"><span data-l="ja">島の朝と静かな暮らしを楽しむ</span><span data-l="en">Enjoy the island's morning and quiet life</span></span><span class="w"><span data-l="ja">12月6日（日）</span><span data-l="en">Sun, Dec 6</span></span></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="sc jr" id="c5" style="--h: 280vh" data-name-ja="この旅は" data-name-en="The journey">
+    <div class="stage">
+      <div class="jimg"></div>
+      <div class="jshade"></div>
+      <div class="txt">
+        <h2 class="rv" style="--a: 0.54; --d: 0.12"><span data-l="ja"><span class="ph">海のそばで、</span><span class="ph">島の日常に浸る旅。</span></span><span data-l="en">A journey into everyday island life, beside the sea.</span></h2>
+        <p class="rv" style="--a: 0.64; --d: 0.1"><span data-l="ja">海や自然のそばで過ごすのが好きな人へ。</span><span data-l="en">For people who like to spend time near the sea and nature.</span></p>
+        <p class="rv" style="--a: 0.7; --d: 0.1"><span data-l="ja">急がず、ゆっくりと出羽島の日常に浸りたい人へ。</span><span data-l="en">For people who want to settle slowly into everyday life on Teba-jima.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="end" id="c6" data-mode="enter" data-name-ja="出羽島　海と共に暮らす" data-name-en="Teba-jima — Living with the sea">
+    <div class="bg"></div>
+    <div class="wrap">
+      <h2 class="rv" style="--a: 0.55; --d: 0.2"><span data-l="ja">出羽島　海と共に暮らす</span><span data-l="en">Teba-jima — Living with the sea</span></h2>
+      <div class="foot caption">
+        <span><span data-l="ja">株式会社出羽島ごーへい</span><span data-l="en">Teba-jima Gohei Co., Ltd.</span></span>
+        <a class="back" href="https://claude.ai/artifact/2HFcPURyz7vQAjLXNqmYoZ"><span data-l="ja">Discovery Japan の地域を見る</span><span data-l="en">Explore Discovery Japan</span> →</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  var root = document.documentElement;
+  var body = document.body;
+  var RM = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var FINE = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  var motionOn = !RM;
+  var lang = "ja";
+
+  /* ---------- split title into characters ---------- */
+  document.querySelectorAll("[data-split]").forEach(function (el) {
+    var text = el.textContent.trim();
+    var isJa = el.getAttribute("data-l") === "ja";
+    var words = isJa ? text.split("") : text.split(" ");
+    var i = 0;
+    el.textContent = "";
+    words.forEach(function (w, wi) {
+      var ws = document.createElement("span");
+      ws.className = "w";
+      (isJa ? [w] : w.split("")).forEach(function (ch) {
+        var c = document.createElement("span");
+        c.className = "c";
+        c.style.setProperty("--i", i++);
+        c.textContent = ch;
+        ws.appendChild(c);
+      });
+      el.appendChild(ws);
+      if (!isJa && wi < words.length - 1) el.appendChild(document.createTextNode(" "));
+    });
+  });
+
+  /* ---------- language ---------- */
+  var bJa = document.getElementById("btn-ja"), bEn = document.getElementById("btn-en");
+  function setLang(l) {
+    lang = l;
+    root.setAttribute("data-lang", l);
+    root.lang = l;
+    bJa.setAttribute("aria-pressed", l === "ja");
+    bEn.setAttribute("aria-pressed", l === "en");
+    hudName(true);
+    buildDial();
+    fitKicker();
+  }
+  bJa.addEventListener("click", function () { setLang("ja"); });
+  bEn.addEventListener("click", function () { setLang("en"); });
+
+  /* ---------- motion toggle ---------- */
+  /* ---------- grain ---------- */
+  (function () {
+    try {
+      var c = document.createElement("canvas"); c.width = c.height = 180;
+      var x = c.getContext("2d"), d = x.createImageData(180, 180);
+      for (var i = 0; i < d.data.length; i += 4) { var v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
+      x.putImageData(d, 0, 0);
+      document.getElementById("grain").style.backgroundImage = "url(" + c.toDataURL() + ")";
+    } catch (e) {}
+  })();
+
+  /* ---------- loader ---------- */
+  var loader = document.getElementById("loader"), ldn = document.getElementById("ldn");
+  var t0 = performance.now(), LOAD_MS = RM ? 0 : 1100;
+  function finishLoad() {
+    body.classList.add("ready");
+    if (loader) { loader.classList.add("out"); setTimeout(function () { loader.remove(); loader = null; }, 1200); }
+  }
+  (function tick() {
+    if (!loader) return;
+    var k = Math.min(1, (performance.now() - t0) / Math.max(1, LOAD_MS));
+    ldn.textContent = Math.round(k * 100);
+    if (k < 1) requestAnimationFrame(tick); else finishLoad();
+  })();
+  if (RM) finishLoad();
+
+  /* ---------- sections and scroll ---------- */
+  var secs = Array.prototype.slice.call(document.querySelectorAll(".sc, .end"));
+  var vh = innerHeight, vw = innerWidth, docH = 1;
+  var sy = scrollY, ty = scrollY;
+  function measure() {
+    vh = innerHeight; vw = innerWidth;
+    secs.forEach(function (s) { s._top = s.getBoundingClientRect().top + scrollY; s._h = s.offsetHeight; s._p = -1; });
+    docH = document.documentElement.scrollHeight;
+    measureTrack();
+    fitKicker();
+  }
+
+  /* subtitle spans exactly the width of the title */
+  function fitKicker() {
+    var k = document.querySelector(".title .kicker");
+    var t = document.querySelector('.title [data-split][data-l="' + (root.getAttribute("data-lang") || "ja") + '"]');
+    if (!k || !t) return;
+    var target = t.getBoundingClientRect().width;
+    if (!target) return;
+    k.style.width = "auto"; k.style.display = "inline-flex"; k.style.fontSize = "20px";
+    var natural = k.getBoundingClientRect().width;
+    k.style.display = "";
+    if (!natural) return;
+    k.style.fontSize = (20 * target / natural).toFixed(2) + "px";
+    k.style.width = target.toFixed(1) + "px";
+  }
+
+  var track = document.getElementById("track");
+  var frames = Array.prototype.slice.call(track.querySelectorAll(".tf"));
+  var trackSpan = 0;
+  function measureTrack() { trackSpan = Math.max(0, track.scrollWidth - vw); }
+
+  var dial = document.getElementById("dial"), dialDot = dial.querySelector("b");
+  var labFrames = frames.filter(function (f) { return f.hasAttribute("data-lab-ja"); });
+  function buildDial() {
+    dial.querySelectorAll("span").forEach(function (n) { n.remove(); });
+    labFrames.forEach(function (f, i) {
+      var s = document.createElement("span");
+      s.textContent = f.getAttribute("data-lab-" + lang);
+      s.style.left = (i / (labFrames.length - 1) * 100) + "%";
+      dial.appendChild(s);
+    });
+  }
+
+  var hudN = document.getElementById("hud-n"), hudT = document.getElementById("hud-t"), hudIdx = -1;
+  function hudName(force) {
+    var idx = 0;
+    var mid = sy + vh * 0.5;
+    secs.forEach(function (s, i) { if (mid >= s._top) idx = i; });
+    if (idx !== hudIdx || force) {
+      hudIdx = idx;
+      hudN.textContent = ("0" + (idx + 1)).slice(-2) + " / 0" + secs.length;
+      hudT.textContent = secs[idx].getAttribute("data-name-" + lang) || "";
+    }
+  }
+
+  var progEl = document.getElementById("prog");
+  var heroSec = document.getElementById("c1"), timeSec = document.getElementById("c3"), stepsSec = document.getElementById("c4");
+  var stp2 = document.getElementById("stp2"), stp3 = document.getElementById("stp3");
+
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function ease(t) { return t * t * (3 - 2 * t); }
+
+  function frame() {
+    ty = scrollY;
+    sy += (ty - sy) * (motionOn ? 0.11 : 1);
+    if (Math.abs(ty - sy) < 0.05) sy = ty;
+
+    secs.forEach(function (s) {
+      var p;
+      if (s.getAttribute("data-mode") === "enter") p = clamp((sy + vh - s._top) / vh, 0, 1);
+      else p = clamp((sy - s._top) / Math.max(1, s._h - vh), 0, 1);
+      if (Math.abs(p - s._p) > 0.0004) { s._p = p; s.style.setProperty("--p", p.toFixed(4)); }
+    });
+
+    /* hero: title letters rise once the footage appears */
+    var hp = heroSec._p;
+    if (hp > 0.17 && !heroSec._t) { heroSec._t = true; heroSec.classList.add("show-title"); }
+    else if (hp < 0.12 && heroSec._t) { heroSec._t = false; heroSec.classList.remove("show-title"); }
+
+    /* steps rail */
+    var spp = stepsSec._p;
+    stp2.classList.toggle("on", spp > 0.46);
+    stp3.classList.toggle("on", spp > 0.76);
+
+    /* horizontal track */
+    var tp = timeSec._p;
+    var te = ease(clamp((tp - 0.04) / 0.9, 0, 1));
+    var tx = -te * trackSpan;
+    track.style.transform = "translate3d(" + tx.toFixed(1) + "px,0,0)";
+    frames.forEach(function (f) {
+      var r = f.offsetLeft + tx + f.offsetWidth / 2 - vw / 2;
+      var off = clamp(r / vw, -1.2, 1.2);
+      var media = f.querySelector(".img, video");
+      if (media) media.style.setProperty("--px", (-off * 7).toFixed(2) + "%");
+    });
+    var dw = dial.clientWidth;
+    var dx = clamp((te * trackSpan - (labFrames[0].offsetLeft + labFrames[0].offsetWidth / 2 - vw / 2)) / Math.max(1, (labFrames[labFrames.length - 1].offsetLeft - labFrames[0].offsetLeft)), 0, 1);
+    dial.style.setProperty("--dx", (dx * dw).toFixed(1));
+
+    /* progress + hud */
+    progEl.style.transform = "scaleX(" + clamp(sy / Math.max(1, docH - vh), 0, 1).toFixed(4) + ")";
+    hudName(false);
+
+    requestAnimationFrame(frame);
+  }
+
+  /* ---------- videos: play only on screen ---------- */
+  var vids = [document.getElementById("v-hero"), document.getElementById("v-sea"), document.getElementById("v-ferry")];
+  var vis = new Map();
+  function syncVideos() {
+    vids.forEach(function (v) {
+      if (motionOn && vis.get(v)) { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); }
+      else v.pause();
+    });
+  }
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { vis.set(e.target, e.isIntersecting); }); syncVideos(); }, { threshold: 0.05 });
+    vids.forEach(function (v) { io.observe(v); });
+  }
+
+  /* ---------- background music: on by default, ♪ button turns it off and on ----------
+     Browsers only allow sound after the viewer's first tap, click or key, so playback
+     starts at that moment if the page was not allowed to start it on load. */
+  var bgm = new Audio("img/bgm.mp3");
+  bgm.loop = true; bgm.preload = "auto"; bgm.volume = 0;
+  var musicOn = true, playing = false, fadeId = 0;
+  var bMusic = document.getElementById("btn-music");
+  function fadeTo(target, ms, done) {
+    var id = ++fadeId, from = bgm.volume, t0 = performance.now();
+    (function step(now) {
+      if (id !== fadeId) return;
+      var k = Math.min(1, (now - t0) / ms);
+      try { bgm.volume = from + (target - from) * k; } catch (e) {}
+      if (k < 1) requestAnimationFrame(step); else if (done) done();
+    })(t0);
+  }
+  function play() {
+    if (!musicOn || playing) return;
+    playing = true;
+    var pr = bgm.play();
+    if (pr && pr.then) pr.then(function () { fadeTo(0.7, 2500); }, function () { playing = false; });
+    else fadeTo(0.7, 2500);
+  }
+  function stop() {
+    fadeTo(0, 600, function () { bgm.pause(); });
+    playing = false;
+  }
+  bMusic.addEventListener("click", function () {
+    if (musicOn && !playing && bgm.paused) { play(); return; }   /* sound was blocked until now: this click starts it */
+    musicOn = !musicOn;
+    bMusic.setAttribute("aria-pressed", musicOn);
+    if (musicOn) play(); else stop();
+  });
+  ["pointerdown", "keydown", "touchstart"].forEach(function (ev) {
+    document.addEventListener(ev, function (e) {
+      if (e.target.closest && e.target.closest("#btn-music")) return;
+      play();
+    }, { passive: true });
+  });
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) { if (playing) bgm.pause(); }
+    else if (playing) { var pr = bgm.play(); if (pr && pr.catch) pr.catch(function () {}); }
+  });
+  play();
+
+  /* ---------- nav links: instant jump ---------- */
+  document.addEventListener("click", function (ev) {
+    var a = ev.target.closest && ev.target.closest('a[href^="#c"]');
+    if (!a) return;
+    var el = document.getElementById(a.getAttribute("href").slice(1));
+    if (!el) return;
+    ev.preventDefault();
+    window.scrollTo(0, el.getBoundingClientRect().top + scrollY);
+  });
+
+  /* ---------- boot ---------- */
+  function onResize() { measure(); }
+  window.addEventListener("resize", onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+  window.addEventListener("load", measure);
+  setLang("ja");
+  onResize();
+  requestAnimationFrame(frame);
+})();
+</script>
+
+</body></html>
